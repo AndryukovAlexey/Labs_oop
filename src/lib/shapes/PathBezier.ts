@@ -1,7 +1,7 @@
 import type { Point2D } from "../math/mat3";
 import type { RasterRenderer } from "../raster/RasterRenderer";
 import { Shape, type Bounds, boundsFromPoints } from "./Shape";
-import { evalCubicBezier, flattenCubicBezier, catmullRomToCubicBeziers, distanceToLineSegment } from "./curveUtils";
+import { flattenCubicBezier, catmullRomToCubicBeziers, distanceToLineSegment } from "./curveUtils";
 
 export type PathMode = "polyline" | "bezier" | "catmull";
 

@@ -18,7 +18,6 @@ function drawDemoScene(r: RasterRenderer) {
   const cyan: RGBA = { r: 30, g: 190, b: 220, a: 255 };
   const green: RGBA = { r: 50, g: 200, b: 100, a: 255 };
   const magenta: RGBA = { r: 255, g: 50, b: 180, a: 255 };
-  const orange: RGBA = { r: 255, g: 140, b: 30, a: 255 };
   const purple: RGBA = { r: 150, g: 100, b: 255, a: 255 };
   const yellow: RGBA = { r: 255, g: 220, b: 30, a: 255 };
 

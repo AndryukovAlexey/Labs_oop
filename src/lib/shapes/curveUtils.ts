@@ -194,50 +194,47 @@ export function catmullRomToCubicBeziers(points: Point2D[], closed = false): Poi
 
   const segments: Point2D[][] = [];
 
-  for (let i = 0; i < points.length - 1; i++) {
-    // Определяем соседние точки
-    const p0 = points[(i - 1 + points.length) % points.length];
-    const p1 = points[i];
-    const p2 = points[(i + 1) % points.length];
-    const p3 = points[(i + 2) % points.length];
+  if (closed) {
+    // Для замкнутого пути: обработать все n сегментов с циклической индексацией
+    for (let i = 0; i < points.length; i++) {
+      const p0 = points[(i - 1 + points.length) % points.length];
+      const p1 = points[i];
+      const p2 = points[(i + 1) % points.length];
+      const p3 = points[(i + 2) % points.length];
 
-    // Если путь открыт, используем логику "без соседей" в начале/конце
-    if (!closed) {
-      if (i === 0) {
-        // Для первого сегмента: p0 = p1 (или используем направление)
-        const cp1 = { x: p1.x + (p2.x - p1.x) / 6, y: p1.y + (p2.y - p1.y) / 6 };
-        const cp2 = { x: p2.x - (p2.x - p1.x) / 6, y: p2.y - (p2.y - p1.y) / 6 };
-        segments.push([p1, cp1, cp2, p2]);
-        continue;
-      }
+      // Стандартная формула Catmull-Rom
+      const cp1 = {
+        x: p1.x + (p2.x - p0.x) / 6,
+        y: p1.y + (p2.y - p0.y) / 6,
+      };
+      const cp2 = {
+        x: p2.x - (p3.x - p1.x) / 6,
+        y: p2.y - (p3.y - p1.y) / 6,
+      };
 
-      if (i === points.length - 2) {
-        // Для последнего сегмента
-        const p0_seg = points[i - 1];
-        const p1_seg = points[i];
-        const p2_seg = points[i + 1];
-
-        const cp1 = { x: p1_seg.x + (p2_seg.x - p0_seg.x) / 6, y: p1_seg.y + (p2_seg.y - p0_seg.y) / 6 };
-        const cp2 = { x: p2_seg.x - (p2_seg.x - p0_seg.x) / 6, y: p2_seg.y - (p2_seg.y - p0_seg.y) / 6 };
-        segments.push([p1_seg, cp1, cp2, p2_seg]);
-        continue;
-      }
+      segments.push([p1, cp1, cp2, p2]);
     }
+  } else {
+    // Для открытого пути: обработать n-1 сегментов
+    for (let i = 0; i < points.length - 1; i++) {
+      // Определяем соседние точки с проверкой границ
+      const p0 = i === 0 ? points[0] : points[i - 1];
+      const p1 = points[i];
+      const p2 = points[i + 1];
+      const p3 = i === points.length - 2 ? points[points.length - 1] : points[i + 2];
 
-    // Стандартная формула Catmull-Rom: кубическая кривая Безье
-    // Управляющие точки:
-    // cp1 = p1 + (p2 - p0) / 6
-    // cp2 = p2 - (p3 - p1) / 6
-    const cp1 = {
-      x: p1.x + (p2.x - p0.x) / 6,
-      y: p1.y + (p2.y - p0.y) / 6,
-    };
-    const cp2 = {
-      x: p2.x - (p3.x - p1.x) / 6,
-      y: p2.y - (p3.y - p1.y) / 6,
-    };
+      // Стандартная формула Catmull-Rom
+      const cp1 = {
+        x: p1.x + (p2.x - p0.x) / 6,
+        y: p1.y + (p2.y - p0.y) / 6,
+      };
+      const cp2 = {
+        x: p2.x - (p3.x - p1.x) / 6,
+        y: p2.y - (p3.y - p1.y) / 6,
+      };
 
-    segments.push([p1, cp1, cp2, p2]);
+      segments.push([p1, cp1, cp2, p2]);
+    }
   }
 
   return segments;
