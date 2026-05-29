@@ -32,6 +32,7 @@ interface EditorState {
     scaleX: number;
     scaleY: number;
     rotation: number;
+    startBounds?: { minX: number; minY: number; maxX: number; maxY: number };
   } | null;
   dragHandle: "nw" | "ne" | "sw" | "se" | "n" | "s" | "e" | "w" | "rotate" | null;
   editPointIndex: number | null;
@@ -229,6 +230,7 @@ function CanvasSceneComponent({ lineAlg }: CanvasSceneProps, ref: React.Ref<Canv
         const bounds = selected.getBounds();
         const handle = getHandleAtPoint(bounds, x, y);
         if (handle) {
+          const startBounds = handle === "rotate" ? undefined : selected.getBounds();
           setState({
             ...prev,
             mode: handle === "rotate" ? "rotate" : "resize",
@@ -241,6 +243,7 @@ function CanvasSceneComponent({ lineAlg }: CanvasSceneProps, ref: React.Ref<Canv
               scaleX: selected.transform.scaleX,
               scaleY: selected.transform.scaleY,
               rotation: selected.transform.rotation,
+              startBounds,
             },
           });
           return;
@@ -321,15 +324,15 @@ function CanvasSceneComponent({ lineAlg }: CanvasSceneProps, ref: React.Ref<Canv
 
     if (prev.mode === "resize" && prev.selectedId !== null && prev.startState && prev.dragHandle) {
       const selected = prev.objects.find((o) => o.id === prev.selectedId);
-      if (selected) {
-        const bounds = selected.getBounds();
+      if (selected && prev.startState.startBounds) {
+        const startBounds = prev.startState.startBounds;
         const dx = x - prev.startMouseX;
         const dy = y - prev.startMouseY;
 
-        let newMinX = bounds.minX;
-        let newMaxX = bounds.maxX;
-        let newMinY = bounds.minY;
-        let newMaxY = bounds.maxY;
+        let newMinX = startBounds.minX;
+        let newMaxX = startBounds.maxX;
+        let newMinY = startBounds.minY;
+        let newMaxY = startBounds.maxY;
 
         if (prev.dragHandle.includes("w")) newMinX += dx;
         if (prev.dragHandle.includes("e")) newMaxX += dx;
